@@ -9,7 +9,7 @@ perception node uses Ultralytics YOLOv5, which is AGPL-3.0.
 |---|---|---|
 | `raptor_bringup/models/iris_raptor/model.sdf` | [ardupilot_gazebo](https://github.com/ArduPilot/ardupilot_gazebo) `models/iris_with_ardupilot` | LGPL-3.0 |
 | `raptor_bringup/worlds/raptor_runway.sdf` | [ardupilot_gazebo](https://github.com/ArduPilot/ardupilot_gazebo) `worlds/iris_runway.sdf` | LGPL-3.0 |
-| `raptor_bringup/models/bird_target/materials/textures/bird.png` | [Haliaeetus leucocephalus in flight over KSC](https://commons.wikimedia.org/wiki/File:Haliaeetus_leucocephalus_in_flight_over_KSC.jpg) (NASA / Gary Rothstein, via Wikimedia Commons); cropped, resized to 512x512 and background made transparent | Public domain (NASA image; use does not imply NASA endorsement) |
+| `raptor_bringup/models/bird_target/materials/textures/bird.png`, `raptor_bringup/models/raptor_rig/materials/textures/bird.png` | [Haliaeetus leucocephalus in flight over KSC](https://commons.wikimedia.org/wiki/File:Haliaeetus_leucocephalus_in_flight_over_KSC.jpg) (NASA / Gary Rothstein, via Wikimedia Commons); cropped, resized to 512x512 and background made transparent | Public domain (NASA image; use does not imply NASA endorsement) |
 
 ## Runtime dependencies (not distributed here)
 

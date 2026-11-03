@@ -127,14 +127,25 @@
     </include>
 
     <!--
-      Bird target 3 m above the upward-facing camera (camera at z ~0.28 m), 0.6 m to
-      the east so it does not overlap the blue z axis of the "axes" model. Yaw 180 deg:
-      in the range sweep this orientation was detected at every distance from 1 to 3 m.
+      Bird target for the camera range sweep (bird_range_sweep), parked 30 m west so the
+      camera does not see it during take-off. The sweep moves it above the camera
+      (x 0.6, yaw 180 deg: detected at every distance from 1 to 3 m).
     -->
     <include>
       <uri>model://bird_target</uri>
       <name>bird_target</name>
-      <pose degrees="true">0.6 0.06 3.28 0 0 180</pose>
+      <pose degrees="true">-30 0.06 3.28 0 0 180</pose>
+    </include>
+
+    <!--
+      Staged raptor rig (bird picture on a pole) for the full-loop scenarios, parked
+      30 m east, outside the 12 m LiDAR range. The scenario node moves it next to the
+      drone with set_pose and drives it with /raptor_rig/cmd_vel.
+    -->
+    <include>
+      <uri>model://raptor_rig</uri>
+      <name>raptor_rig</name>
+      <pose>30 0.06 3.0 0 0 0</pose>
     </include>
 
     <!-- Static test pillar, 4 m north of the take-off point. -->

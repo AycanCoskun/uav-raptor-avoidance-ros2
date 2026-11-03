@@ -1,0 +1,62 @@
+# Parameters of the raptor avoidance nodes. Values are the ones reported in the paper
+# (icSoftComp 2026), converted to metres and seconds.
+
+lidar_hazard_node:
+  ros__parameters:
+    use_sim_time: true
+    hazard_distance_m: 1.2      # D_hazard
+    sector_distance_m: 1.2
+    confirm_n: 2                # N-of-M, N = 2
+    confirm_m: 3                # M = 3
+    approach_window: 10         # scans used for the approach rate (1 s at 10 Hz)
+
+bird_detector_node:
+  ros__parameters:
+    use_sim_time: true
+    target_class: 14            # COCO bird
+    conf_threshold: 0.35        # CONF_TH
+    iou_threshold: 0.45
+    confirm_n: 2
+    confirm_m: 3
+    num_threads: 2
+    publish_debug_image: true
+
+fsm_node:
+  ros__parameters:
+    use_sim_time: true
+    loop_hz: 4.0                # LOOP_HZ
+    input_timeout_s: 1.0        # older sensor data counts as "nothing detected"
+    vision_window: 3            # detections considered per tick, as in v3
+    dry_run: false              # true: run the FSM but send nothing to MAVROS
+    w_yolo: 0.6
+    w_lidar: 0.4
+    min_yolo_conf: 0.05         # fusion = 0 at or below this YOLO confidence
+    d_warn_m: 3.0               # D_warn
+    d_hazard_m: 1.2             # D_hazard
+    d_confirm_m: 1.5            # D_confirm
+    fusion_warn: 0.35           # EARLY_WARNING threshold
+    fusion_confirm: 0.65        # THREAT_CONFIRMED threshold
+    approach_rate_mps: 0.05     # 50 mm/s
+    escape_duration_s: 5.0
+    early_warn_timeout_s: 5.0
+    escape_vx: 3.0              # NED, m/s
+    escape_vy: 3.0
+    escape_vz_up: 1.5
+    escape_vz_down: 0.5
+    avoid_speed: 1.5            # obstacle avoidance, m/s
+    avoid_back_speed: 1.0
+    avoid_full_speed_m: 2.0     # speed factor 1.0 / 0.5 / 0 by distance
+    avoid_stop_m: 1.0
+
+scenario_node:
+  ros__parameters:
+    use_sim_time: true
+    takeoff: true
+    takeoff_alt_m: 10.0
+    start_distance_m: 4.0       # raptor rig: pole distance east of the drone at start
+    stop_distance_m: 0.8
+    approach_speed_mps: 0.5
+    bird_height_m: 2.0          # bird picture above the camera (geometry test, step 7)
+    forward_speed_mps: 0.2      # obstacle scenario: speed towards the test pillar
+    release_distance_m: 1.6     # stop commanding this far from the pillar (FSM takes over at 1.2 m)
+    monitor_s: 30.0

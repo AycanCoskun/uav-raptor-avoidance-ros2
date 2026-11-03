@@ -4,7 +4,7 @@ package_name = 'raptor_fsm'
 
 setup(
     name=package_name,
-    version='0.0.0',
+    version='0.1.0',
     packages=find_packages(exclude=['test']),
     data_files=[
         ('share/ament_index/resource_index/packages',
@@ -24,6 +24,9 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'fsm_node = raptor_fsm.fsm_node:main',
+            'scenario_node = raptor_fsm.scenario_node:main',
+            'export_run_csv = raptor_fsm.export_run_csv:main',
         ],
     },
 )

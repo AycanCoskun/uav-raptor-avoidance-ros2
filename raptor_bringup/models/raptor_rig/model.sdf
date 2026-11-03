@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <!--
+    Model origin = centre of the bird picture. The pole hangs 15 m down from a point
+    0.3 m behind the picture (+X side), so a rig placed h metres above the camera and
+    moving towards the drone along -X crosses the LiDAR scan plane at any flight
+    altitude up to ~15 m, and in the camera image the pole never covers the bird.
+
+    Not static, gravity off, no collision: it only exists for the sensors. The
+    VelocityControl system moves it with a Twist on /model/raptor_rig/cmd_vel
+    (bridged from the ROS topic /raptor_rig/cmd_vel).
+  -->
+  <model name="raptor_rig">
+    <link name="link">
+      <gravity>false</gravity>
+      <inertial>
+        <mass>1.0</mass>
+        <inertia>
+          <ixx>1.0</ixx><iyy>1.0</iyy><izz>1.0</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+
+      <!-- Bird picture facing down, same texture and yaw (180 deg) as bird_target. -->
+      <visual name="bird">
+        <pose>0 0 0 0 0 3.14159</pose>
+        <cast_shadows>false</cast_shadows>
+        <geometry>
+          <plane>
+            <normal>0 0 -1</normal>
+            <size>0.5 0.5</size>
+          </plane>
+        </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://raptor_rig/materials/textures/bird.png</albedo_map>
+              <emissive_map>model://raptor_rig/materials/textures/bird.png</emissive_map>
+              <metalness>0.0</metalness>
+              <roughness>1.0</roughness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+
+      <!-- Pole seen by the LiDAR: 0.10 m diameter, top just below the picture. -->
+      <visual name="pole">
+        <pose>0.3 0 -7.52 0 0 0</pose>
+        <cast_shadows>false</cast_shadows>
+        <geometry>
+          <cylinder>
+            <radius>0.05</radius>
+            <length>15.0</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.35 0.35 0.35 1</ambient>
+          <diffuse>0.35 0.35 0.35 1</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <plugin filename="gz-sim-velocity-control-system"
+            name="gz::sim::systems::VelocityControl">
+      <topic>/model/raptor_rig/cmd_vel</topic>
+    </plugin>
+  </model>
+</sdf>
