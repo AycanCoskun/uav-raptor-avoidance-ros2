@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <!--
+    0.5 m wide bird target (BIRD_WIDTH_M in the paper) facing down towards the
+    upward-facing camera. Not static, so it can be moved with
+    /world/<world>/set_pose; gravity is off and there is no collision, so it only
+    exists for the camera and never touches the LiDAR scan plane or the drone.
+  -->
+  <model name="bird_target">
+    <link name="link">
+      <gravity>false</gravity>
+      <inertial>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.002</ixx><iyy>0.002</iyy><izz>0.004</izz>
+          <ixy>0</ixy><ixz>0</ixz><iyz>0</iyz>
+        </inertia>
+      </inertial>
+      <visual name="visual">
+        <cast_shadows>false</cast_shadows>
+        <geometry>
+          <plane>
+            <normal>0 0 -1</normal>
+            <size>0.5 0.5</size>
+          </plane>
+        </geometry>
+        <material>
+          <ambient>1 1 1 1</ambient>
+          <diffuse>1 1 1 1</diffuse>
+          <specular>0 0 0 1</specular>
+          <pbr>
+            <metal>
+              <albedo_map>model://bird_target/materials/textures/bird.png</albedo_map>
+              <emissive_map>model://bird_target/materials/textures/bird.png</emissive_map>
+              <metalness>0.0</metalness>
+              <roughness>1.0</roughness>
+            </metal>
+          </pbr>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

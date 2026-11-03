@@ -126,6 +126,17 @@
       <pose degrees="true">0 0 0.195 0 0 90</pose>
     </include>
 
+    <!--
+      Bird target 3 m above the upward-facing camera (camera at z ~0.28 m), 0.6 m to
+      the east so it does not overlap the blue z axis of the "axes" model. Yaw 180 deg:
+      in the range sweep this orientation was detected at every distance from 1 to 3 m.
+    -->
+    <include>
+      <uri>model://bird_target</uri>
+      <name>bird_target</name>
+      <pose degrees="true">0.6 0.06 3.28 0 0 180</pose>
+    </include>
+
     <!-- Static test pillar, 4 m north of the take-off point. -->
     <model name="test_pillar">
       <static>true</static>
