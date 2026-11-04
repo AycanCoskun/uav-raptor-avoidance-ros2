@@ -27,6 +27,7 @@ setup(
             'fsm_node = raptor_fsm.fsm_node:main',
             'scenario_node = raptor_fsm.scenario_node:main',
             'export_run_csv = raptor_fsm.export_run_csv:main',
+            'demo_recorder = raptor_fsm.demo_recorder:main',
         ],
     },
 )

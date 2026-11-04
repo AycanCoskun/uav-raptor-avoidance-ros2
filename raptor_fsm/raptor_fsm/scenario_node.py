@@ -59,7 +59,7 @@ class ScenarioNode(Node):
         self.approach_speed_mps = self.declare_parameter('approach_speed_mps', 0.5).value
         self.bird_height_m = self.declare_parameter('bird_height_m', 2.0).value
         self.bird_offset_m = self.declare_parameter('bird_offset_m', 0.3).value
-        self.camera_z_offset_m = self.declare_parameter('camera_z_offset_m', 0.275).value
+        self.camera_z_offset_m = self.declare_parameter('camera_z_offset_m', 0.08).value
         self.camera_y_offset_m = self.declare_parameter('camera_y_offset_m', 0.06).value
         self.forward_speed_mps = self.declare_parameter('forward_speed_mps', 0.2).value
         self.release_distance_m = self.declare_parameter('release_distance_m', 1.6).value
@@ -206,8 +206,8 @@ class ScenarioNode(Node):
             self.sim_sleep(0.1)
 
     def run_raptor(self) -> None:
-        # Gazebo world = MAVROS local ENU here (the drone spawns at the origin); the local
-        # z is measured from the take-off point, the camera is 0.275 m above it.
+        # Gazebo world = MAVROS local ENU here (the drone spawns at the origin; local z is
+        # base_link height, 0.19 m on the ground); the camera is 0.08 m above base_link.
         p = self.pose()
         x = p.x + self.start_distance_m - self.bird_offset_m
         y = p.y + self.camera_y_offset_m

@@ -29,6 +29,7 @@ def tick_row(t_sim, fsm, latest):
     mav = latest.get('/mavros/state')
     pose = latest.get('/mavros/local_position/pose')
     vel = latest.get('/mavros/local_position/velocity_local')
+    rig = latest.get('/raptor_rig/cmd_vel')
     return {
         't_sim': round(t_sim, 3),
         'state': fsm.state,
@@ -50,6 +51,7 @@ def tick_row(t_sim, fsm, latest):
         'v_east': rounded(vel, lambda m: m.twist.linear.x, 2),
         'v_north': rounded(vel, lambda m: m.twist.linear.y, 2),
         'v_up': rounded(vel, lambda m: m.twist.linear.z, 2),
+        'rig_cmd_vx': rounded(rig, lambda m: m.linear.x, 2),
         'command': fsm.command,
         'note': fsm.note,
     }

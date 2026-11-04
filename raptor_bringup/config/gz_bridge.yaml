@@ -29,3 +29,11 @@
   ros_type_name: "geometry_msgs/msg/Twist"
   gz_type_name: "gz.msgs.Twist"
   direction: ROS_TO_GZ
+
+# Demo recording only: third-person camera, bridged lazily (no cost without subscribers).
+- ros_topic_name: "/demo_camera/image"
+  gz_topic_name: "/demo_camera/image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+  lazy: true

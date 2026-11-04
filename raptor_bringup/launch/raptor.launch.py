@@ -36,6 +36,7 @@ def generate_launch_description():
     fcu_url = LaunchConfiguration('fcu_url')
     scenario = LaunchConfiguration('scenario')
     record = LaunchConfiguration('record')
+    demo_camera = LaunchConfiguration('demo_camera')
     bag_path = LaunchConfiguration('bag_path')
 
     return LaunchDescription([
@@ -52,6 +53,9 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'bag_path', default_value='raptor_run',
             description='Output folder of the rosbag (must not exist yet).'),
+        DeclareLaunchArgument(
+            'demo_camera', default_value='false',
+            description='Spawn the third-person camera used for the demo recording.'),
 
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(pkg_share, 'launch', 'sim.launch.py')),
@@ -72,6 +76,15 @@ def generate_launch_description():
         Node(package='raptor_fsm', executable='scenario_node', name='scenario_node',
              output='screen', parameters=[params, {'scenario': scenario}],
              condition=LaunchConfigurationNotEquals('scenario', 'none')),
+
+        # South-west of the scene looking north-east: the rig enters from the right and
+        # the escape (north-west) goes to the left of the image.
+        Node(package='ros_gz_sim', executable='create', name='spawn_demo_camera',
+             output='screen',
+             arguments=['-world', 'raptor_runway', '-name', 'demo_camera',
+                        '-file', os.path.join(pkg_share, 'models', 'demo_camera', 'model.sdf'),
+                        '-x', '-20.0', '-y', '-10.0', '-z', '13.0', '-P', '0.15', '-Y', '0.84'],
+             condition=IfCondition(demo_camera)),
 
         ExecuteProcess(
             cmd=['ros2', 'bag', 'record', '-o', bag_path] + RECORDED_TOPICS,
