@@ -6,7 +6,9 @@ Export a recorded run to CSV, one row per state machine tick.
 
 Each row holds the /fsm/state message and the latest detection, LiDAR and vehicle
 values recorded before it, i.e. the same columns as state_log_v3.csv plus the vehicle
-position and velocity. Usage: ros2 run raptor_fsm export_run_csv <bag> <output.csv>
+position and velocity. t_sim is the simulation time of the tick and t_rel the time since
+the first non-zero raptor rig command (empty if the run has none).
+Usage: ros2 run raptor_fsm export_run_csv <bag> <output.csv>
 """
 
 import argparse
@@ -17,6 +19,7 @@ import rosbag2_py
 from rosidl_runtime_py.utilities import get_message
 
 FSM_TOPIC = '/fsm/state'
+RIG_TOPIC = '/raptor_rig/cmd_vel'
 
 
 def rounded(msg, getter, digits=3):
@@ -29,9 +32,10 @@ def tick_row(t_sim, fsm, latest):
     mav = latest.get('/mavros/state')
     pose = latest.get('/mavros/local_position/pose')
     vel = latest.get('/mavros/local_position/velocity_local')
-    rig = latest.get('/raptor_rig/cmd_vel')
+    rig = latest.get(RIG_TOPIC)
     return {
         't_sim': round(t_sim, 3),
+        't_rel': '',  # filled in by export() once the rig start is known
         'state': fsm.state,
         'layer': fsm.layer_active,
         'fusion': round(fsm.fusion_score, 3),
@@ -65,6 +69,7 @@ def export(bag_path: str, output: str) -> int:
     latest = {}
     rows = []
     t_sim = 0.0
+    t_start = None  # simulation time of the first non-zero rig command
     while reader.has_next():
         topic, data, _ = reader.read_next()
         msg = deserialize_message(data, types[topic])
@@ -74,8 +79,15 @@ def export(bag_path: str, output: str) -> int:
             rows.append(tick_row(t_sim, msg, latest))
         else:
             latest[topic] = msg
+            # The bag stamps are wall-clock time; the latest /clock message is the
+            # simulation time at which the command was recorded.
+            if topic == RIG_TOPIC and t_start is None and msg.linear.x != 0.0:
+                t_start = t_sim
     if not rows:
         raise SystemExit(f'no {FSM_TOPIC} messages in {bag_path}')
+    if t_start is not None:
+        for row in rows:
+            row['t_rel'] = round(row['t_sim'] - t_start, 3)
     with open(output, 'w', newline='') as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()))
         writer.writeheader()

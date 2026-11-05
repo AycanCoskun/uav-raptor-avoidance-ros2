@@ -1,3 +1,6 @@
+# Copyright 2026 Aycan Coskun
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Start Gazebo Harmonic with the raptor test world and bridge sensor topics to ROS 2.
 
 ArduPilot SITL is started separately (see README) and connects to the

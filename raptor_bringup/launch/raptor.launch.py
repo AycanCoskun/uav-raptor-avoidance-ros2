@@ -1,3 +1,6 @@
+# Copyright 2026 Aycan Coskun
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Full raptor avoidance system in simulation.
 
 Starts Gazebo with the sensor bridge (sim.launch.py), the LiDAR hazard node, the bird

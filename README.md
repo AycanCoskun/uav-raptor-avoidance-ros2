@@ -96,7 +96,7 @@ stateDiagram-v2
   OBSTACLE_AVOID --> IDLE: hazard cleared
   IDLE --> EARLY_WARNING: fusion ≥ 0.35
   OBSTACLE_AVOID --> EARLY_WARNING: fusion ≥ 0.35
-  EARLY_WARNING --> IDLE: no bird for 5 s
+  EARLY_WARNING --> IDLE: no bird after 5 s in EARLY_WARNING
   EARLY_WARNING --> THREAT_CONFIRMED: fusion ≥ 0.65 and d < 1.5 m
   THREAT_CONFIRMED --> EARLY_WARNING: d ≥ 1.5 m or YOLO confirmation lost
   THREAT_CONFIRMED --> ESCAPE: approach rate > 0.05 m/s
@@ -108,10 +108,12 @@ stateDiagram-v2
 - YOLO alone reaches at most 0.6 and the LiDAR alone at most 0.4, both below the THREAT_CONFIRMED
   threshold, so an escape always needs both sensors.
 - The state machine moves by at most one state per tick (4 Hz).
+- As in v3, OBSTACLE_AVOID reacts to the LiDAR hazard flag of the latest scan. Of the two N-of-M
+  confirmations only the YOLO one is used: THREAT_CONFIRMED falls back when it is lost.
 - **ESCAPE** sends a NED velocity every tick: `vx = 3.0` m/s, `vy = ±3.0` m/s away from the bird's
   horizontal image position, `vz = −1.5` (up) or `+0.5` (down) from its vertical image position.
-- **OBSTACLE_AVOID** sidesteps away from the blocked sector at 1.5 m/s, scaled by 1.0 / 0.5 / 0 for
-  distances above 2 m / 1–2 m / below 1 m.
+- **OBSTACLE_AVOID** sidesteps away from the blocked sector at 1.5 m/s (moves forward at 1.0 m/s if
+  the back sector is blocked), scaled by 1.0 / 0.5 / 0 for distances above 2 m / 1–2 m / below 1 m.
 
 All values are in [`raptor_bringup/config/raptor_params.yaml`](raptor_bringup/config/raptor_params.yaml):
 
@@ -130,15 +132,19 @@ and ArduPilot SITL runs in lockstep with Gazebo.
 
 ### Raptor scenario
 
-The drone hovers at 10 m. The raptor rig starts 4 m east of it and approaches at 0.5 m/s, with the
-bird picture 2.0 m above the camera. The upward camera sees the picture and the horizontal LiDAR sees
-the pole. As in the paper, the state machine fuses the bird confidence with the range of the closest
-LiDAR object.
+The drone hovers at 10 m. The raptor rig's pole starts 4 m east of it and approaches at 0.5 m/s; the
+bird picture is 0.3 m in front of the pole and 2.0 m above the camera. The upward camera sees the
+picture and the horizontal LiDAR sees the pole. As in the paper, the state machine fuses the bird
+confidence with the range of the closest LiDAR object.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/images/scenario_raptor_dark.png">
-  <img alt="LiDAR distance, YOLO confidence, fusion score, drone velocity and state over time" src="docs/images/scenario_raptor_light.png">
-</picture>
+![LiDAR distance, YOLO confidence, fusion score, drone velocity and state over time, with the bird detection, the escape command and the time the bird would reach the drone without an escape](docs/images/scenario_raptor.png)
+
+*Time 0 is the first rig command. The bird picture is 2.0 m above the camera, so "reaches the
+drone" means that the picture centre passes over the drone; its position is the rig's start
+position plus its speed (0.5 m/s) times the time. The rig itself stops with the picture 0.5 m from
+the drone, so the arrival without an escape is extrapolated. Each state machine decision takes at
+most one 0.25 s tick. The state machine decided on the LiDAR distance to the pole, so it saw the
+bird about 0.25 m farther away than it was (a test-rig artefact).*
 
 | Transition | Time | Values ([run data](docs/results/scenario_raptor_sim.csv)) |
 |---|---|---|
@@ -148,8 +154,9 @@ LiDAR object.
 | ESCAPE → RTL | 10.75 s | after 5 s of escape (+ one tick) |
 
 - The escape vector is the same as in the paper's SITL test (Table 4: (3.0, −3.0, 0.5)).
-- The vehicle started moving 0.5–0.75 s after the escape command and reached the commanded velocity
-  about 2 s later. In 5 s it moved 11.5 m north, 11.5 m west (16 m) and 2.3 m down, then flew home in RTL
+- The vehicle's velocity estimate showed motion 0.26 s after the escape command (its first sample
+  after it; the CSV, which holds the latest sample at each tick, shows it one tick later) and
+  reached the commanded velocity about 2 s later. In 5 s it moved 11.5 m north, 11.5 m west (16 m) and 2.3 m down, then flew home in RTL
   (the first two runs were recorded until it had landed and disarmed).
 - The scenario passed in all five recorded runs (in the first three the picture was 2.2 m above
   the camera because of a height offset that was fixed later). Transition times varied by less
@@ -262,7 +269,7 @@ After a run:
 
 ```bash
 ros2 run raptor_fsm export_run_csv raptor_run raptor_run.csv
-python3 ~/raptor_ws/src/uav-raptor-avoidance-ros2/docs/scripts/plot_scenario.py raptor_run.csv raptor_run
+python3 ~/raptor_ws/src/uav-raptor-avoidance-ros2/docs/scripts/plot_scenario.py raptor_run.csv raptor_run.png
 ```
 
 ## Repository layout
