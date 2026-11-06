@@ -147,7 +147,7 @@ def obstacle_velocity(sector: int, distance_m: float, params: FsmParams) -> Velo
         factor = 0.5
     else:
         # Too close: stop and hold (paper). OBSTACLE_AVOID is only left when the hazard
-        # clears, so a vehicle held inside this distance stays there (see step 7 tests).
+        # clears, so a vehicle held inside this distance stays there (see Findings in the README).
         factor = 0.0
     return tuple(factor * v for v in direction)
 

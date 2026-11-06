@@ -36,9 +36,16 @@ THEME = {
     'surface': '#fcfcfb', 'ink': '#0b0b0b', 'ink2': '#52514e', 'muted': '#898781',
     'grid': '#e1e0d9', 'axis': '#c3c2b7',
     'series': ['#2a78d6', '#eb6834', '#1baf7a', '#eda100'],
-    'on_fill': ['#ffffff', '#ffffff', '#ffffff', '#0b0b0b'], 'idle': '#c3c2b7',
 }
-RAPTOR_STATES = ['EARLY_WARNING', 'THREAT_CONFIRMED', 'ESCAPE', 'RTL']  # fixed slot order
+# State colours of the demo GIF (STATE_COLOURS in raptor_fsm/demo_recorder.py), RGB.
+STATE_COLOURS = {
+    'IDLE': (110, 110, 110),
+    'OBSTACLE_AVOID': (40, 120, 220),
+    'EARLY_WARNING': (230, 170, 0),
+    'THREAT_CONFIRMED': (235, 100, 20),
+    'ESCAPE': (210, 30, 30),
+    'RTL': (30, 140, 70),
+}
 SHORT = {'IDLE': 'IDLE', 'EARLY_WARNING': 'EARLY_WARN.', 'THREAT_CONFIRMED': 'THREAT_CONF.',
          'ESCAPE': 'ESCAPE', 'RTL': 'RTL', 'OBSTACLE_AVOID': 'OBSTACLE_AVOID'}
 EVENT_DASH = (0, (3, 2))
@@ -83,6 +90,23 @@ def segments(t, rows):
     for i in range(len(out) - 1):
         out[i][2] = out[i + 1][1]
     return out
+
+
+def luminance(rgb):
+    """WCAG relative luminance of an RGB colour (0-255 per channel)."""
+    lin = [c / 255 / 12.92 if c / 255 <= 0.04045 else ((c / 255 + 0.055) / 1.055) ** 2.4
+           for c in rgb]
+    return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2]
+
+
+def state_fill(state, theme):
+    """Band colour of a state and the text colour with the higher contrast on it."""
+    rgb = STATE_COLOURS.get(state, STATE_COLOURS['IDLE'])
+    ink = tuple(int(theme['ink'][i:i + 2], 16) for i in (1, 3, 5))
+    on_white = 1.05 / (luminance(rgb) + 0.05)
+    on_ink = (luminance(rgb) + 0.05) / (luminance(ink) + 0.05)
+    text = '#ffffff' if on_white >= on_ink else theme['ink']
+    return tuple(c / 255 for c in rgb), text
 
 
 def first_index(rows, test):
@@ -275,11 +299,7 @@ def plot(path, output):
     ax.spines['bottom'].set_color(theme['axis'])
     ax.tick_params(colors=theme['muted'], labelsize=8, length=0)
     for state, x0, x1 in segs:
-        if state in RAPTOR_STATES:
-            slot = RAPTOR_STATES.index(state)
-            fill, ink = theme['series'][slot], theme['on_fill'][slot]
-        else:
-            fill, ink = theme['idle'], theme['ink']
+        fill, ink = state_fill(state, theme)
         # 2 px surface gap between neighbouring segments
         ax.broken_barh([(x0, max(x1 - x0 - 0.03, 0.01))], (0, 1), facecolors=fill)
         if x1 - x0 > 1.3:

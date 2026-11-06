@@ -56,7 +56,7 @@ scenario_node:
     start_distance_m: 4.0       # raptor rig: pole distance east of the drone at start
     stop_distance_m: 0.8
     approach_speed_mps: 0.5
-    bird_height_m: 2.0          # bird picture above the camera (geometry test, step 7)
+    bird_height_m: 2.0          # bird picture above the camera
     forward_speed_mps: 0.2      # obstacle scenario: speed towards the test pillar
     release_distance_m: 1.6     # stop commanding this far from the pillar (FSM takes over at 1.2 m)
     monitor_s: 30.0

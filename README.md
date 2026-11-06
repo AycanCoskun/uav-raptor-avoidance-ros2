@@ -141,10 +141,11 @@ confidence with the range of the closest LiDAR object.
 
 *Time 0 is the first rig command. The bird picture is 2.0 m above the camera, so "reaches the
 drone" means that the picture centre passes over the drone; its position is the rig's start
-position plus its speed (0.5 m/s) times the time. The rig itself stops with the picture 0.5 m from
-the drone, so the arrival without an escape is extrapolated. Each state machine decision takes at
-most one 0.25 s tick. The state machine decided on the LiDAR distance to the pole, so it saw the
-bird about 0.25 m farther away than it was (a test-rig artefact).*
+position plus its speed (0.5 m/s) times the time. Against the scan times in the recorded bag, the
+LiDAR pole distance follows this motion within 1 cm (rms 8 mm). The rig itself stops with the
+picture 0.5 m from the drone, so the arrival without an escape is extrapolated. Each state machine
+decision takes at most one 0.25 s tick. The state machine decided on the LiDAR distance to the
+pole, so it saw the bird about 0.25 m farther away than it was (a test-rig artefact).*
 
 | Transition | Time | Values ([run data](docs/results/scenario_raptor_sim.csv)) |
 |---|---|---|
@@ -232,7 +233,7 @@ datasets), [ArduPilot](https://github.com/ArduPilot/ardupilot) Copter-4.6.3 SITL
 and `GZ_SIM_RESOURCE_PATH` set.
 
 ```bash
-sudo apt install python3-opencv python3-matplotlib
+sudo apt install python3-pip python3-opencv python3-matplotlib
 python3 -m pip install --user --break-system-packages --no-deps onnxruntime==1.31.1
 mkdir -p ~/raptor_ws/src && cd ~/raptor_ws/src
 git clone https://github.com/AycanCoskun/uav-raptor-avoidance-ros2.git
